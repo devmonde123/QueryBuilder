@@ -1,0 +1,16 @@
+{
+    "name": "abmes/pdo",
+    "description": "cc",
+	"license": "MIT",
+    "authors": [
+        {
+            "name": "devmonde",
+            "email": "abdouarbiadima@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "App\\": "./src/"
+        }
+    }
+}
