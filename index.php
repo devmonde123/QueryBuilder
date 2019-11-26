@@ -16,15 +16,15 @@ include "vendor/autoload.php";
 use App\Database\DatabasePdo;
 use App\Database\QueryBuilder;
 use App\PaginationManager;
-
+$bdd = (new DatabasePdo())->getPdo();
 if (isset($_GET['remove'])) {
-    $queryBuilder = new QueryBuilder();
+    $queryBuilder = new QueryBuilder($bdd);
     $queryBuilder->delete()->from("users")
         ->where("id=:id")
         ->setParam("id", $_GET['remove'])
         ->excute();
 }
-$bdd = (new DatabasePdo())->getPdo();
+
 $limit = 4;
 $page = isset($_GET['page']) ? $_GET['page'] : 1;
 $search = isset($_GET['search']) ? $_GET['search'] : '';
@@ -32,7 +32,7 @@ $offest = $page <= 1 ? 0 : ($page - 1) * $limit;
 
 $queryBuilder = new QueryBuilder($bdd);
 $items = $queryBuilder
-    ->select('id,nom,prenom,age')
+    ->select('id,firstname,lastname,age')
     ->from('users')
     #->where("age>50")
     ->orderBy('id', 'asc')
@@ -40,7 +40,7 @@ $items = $queryBuilder
     ->offset($offest);
 if (isset($_GET['search'])) {
     $items = $items
-        ->where(" nom like '" . $_GET['search'] . "%' or prenom like '" . $_GET['search'] . "%' or age = '" . $_GET['search'] . "'");
+        ->where(" firstname like '" . $_GET['search'] . "%' or lastname like '" . $_GET['search'] . "%' or age = '" . $_GET['search'] . "'");
 }
 $items = $items->fetchAll();
 ?>
@@ -54,8 +54,8 @@ $items = $items->fetchAll();
     <thead>
     <tr>
         <th scope="col">#</th>
-        <th scope="col">nom</th>
-        <th scope="col">Prenom</th>
+        <th scope="col">firstname</th>
+        <th scope="col">lastname</th>
         <th scope="col">Age</th>
         <th scope="col">Action</th>
     </tr>
@@ -64,8 +64,8 @@ $items = $items->fetchAll();
     <?php foreach ($items as $item) { ?>
         <tr>
             <th scope="row"><?= $item['id']; ?></th>
-            <td><?= $item['nom']; ?></td>
-            <td><?= $item['prenom']; ?></td>
+            <td><?= $item['firstname']; ?></td>
+            <td><?= $item['lastname']; ?></td>
             <td><?= $item['age']; ?></td>
             <td><a type="button" class="btn btn-danger"
                    href="?remove=<?= $item['id']; ?>&page=<?= $page; ?>">Remove</button></td>
