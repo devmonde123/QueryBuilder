@@ -9,8 +9,8 @@
 namespace App\Database;
 
 use PDO;
+
 //use App\Modules\Category\CategoryEntity;
-use App\Database\DatabasePdo;
 
 
 /**
@@ -32,7 +32,7 @@ class QueryBuilder
      * @var
      */
     private $from;
-	/**
+    /**
      * @var
      */
     private $delete;
@@ -70,41 +70,6 @@ class QueryBuilder
     }
 
     /**
-
-     */
-    public function getPdo(DatabasePdo $bdd): DatabasePdo {
-        //$this->bdd = $bdd;
-    }
-
-    public function fetch(string $field)
-    {
-        $query = $this->bdd->prepare($this->toSQL());
-        $query->execute($this->params);
-        $result = $query->fetchAll();
-        if ($result === false) {
-            return null;
-        }
-        return $result ?? null;
-    }
-
-    /**
-     * @param mixed ...$fields
-     * @return QueryBuilder
-     */
-    public function select(...$fields): self
-    {
-        if(is_array($fields[0])){
-            $fields = $fields[0];
-        }
-        if($this->fields  == ['*']){
-            $this->fields = $fields;
-            return $this;
-        }
-        $this->fields = array_merge($this->fields, $fields);
-        return $this;
-    }
-
-    /**
      * @param string $table
      * @param string|NULL $alias
      * @return QueryBuilder
@@ -122,7 +87,7 @@ class QueryBuilder
      */
     public function delete(): self
     {
-		$this->delete = true;
+        $this->delete = true;
         return $this;
     }
 
@@ -137,6 +102,15 @@ class QueryBuilder
     }
 
     /**
+     * @param int $page
+     * @return QueryBuilder
+     */
+    public function page(int $page): self
+    {
+        return $this->offset($this->limit * ($page - 1));
+    }
+
+    /**
      * @param int $offset
      * @return QueryBuilder
      */
@@ -144,15 +118,6 @@ class QueryBuilder
     {
         $this->offset = $offset;
         return $this;
-    }
-
-    /**
-     * @param int $page
-     * @return QueryBuilder
-     */
-    public function page(int $page): self
-    {
-        return $this->offset($this->limit * ($page - 1));
     }
 
     /**
@@ -172,8 +137,8 @@ class QueryBuilder
      */
     public function setParam(string $key, string $value): self
     {
-         $this->params[$key] = $value;
-         return $this;
+        $this->params[$key] = $value;
+        return $this;
     }
 
     /**
@@ -208,6 +173,38 @@ class QueryBuilder
         return $result ?? null;
     }
 
+    /**
+     * @return string
+     */
+    public function toSQL(): string
+    {
+        $fields = implode(', ', $this->fields);
+        $query = "SELECT $fields FROM {$this->from}";
+        if (!empty($this->select)) {
+            $query = "SELECT {implode(', ',$this->select)} FROM {$this->from}";
+            echo $query;
+        }
+        if (!empty($this->delete)) {
+            $fields = '';
+            $query = "delete FROM {$this->from}";
+        }
+        if ($this->where) {
+            $query .= " WHERE " . $this->where;
+        }
+        if (!empty($this->order)) {
+            $query .= " ORDER BY " . implode(', ', $this->order);
+        }
+        if ($this->limit > 0) {
+            $query .= " LIMIT " . $this->limit;
+        }
+        if ($this->offset !== null) {
+            $query .= " OFFSET " . $this->offset;
+        }
+        if ($this->page !== 0) {
+            $query .= " OFFSET " . $this->offset;
+        }
+        return $query;
+    }
 
     /**
      * @return array|null
@@ -230,7 +227,6 @@ class QueryBuilder
      */
     public function excute()
     {
-        //die("ddd");
         $query = $this->bdd->prepare($this->toSQL());
         $query->execute($this->params);
     }
@@ -238,44 +234,40 @@ class QueryBuilder
     /**
      * @return int
      */
-    public function count(): int{
-		$this->fields = [];
-		$this->offset = null;
-		$this->limit = null;
-		$this->order = null;
+    public function count(): int
+    {
+        $this->fields = [];
+        $this->offset = null;
+        $this->limit = null;
+        $this->order = null;
         return (int)(clone $this)->select('count(id) as count')->fetch('count')[0]->count;
     }
 
-    /**
-     * @return string
-     */
-    public function toSQL(): string
+    public function fetch(string $field)
     {
-        $fields = implode(', ', $this->fields);
-        $query = "SELECT $fields FROM {$this->from}";
-        if (!empty($this->select)) {
-            $query = "SELECT {implode(', ',$this->select)} FROM {$this->from}";
-            echo $query;
+        $query = $this->bdd->prepare($this->toSQL());
+        $query->execute($this->params);
+        $result = $query->fetchAll();
+        if ($result === false) {
+            return null;
         }
-		if(!empty($this->delete)){
-			$fields = '';
-			$query = "delete FROM {$this->from}";
-		}
-        if ($this->where) {
-            $query .= " WHERE " . $this->where;
+        return $result ?? null;
+    }
+
+    /**
+     * @param mixed ...$fields
+     * @return QueryBuilder
+     */
+    public function select(...$fields): self
+    {
+        if (is_array($fields[0])) {
+            $fields = $fields[0];
         }
-        if (!empty($this->order)) {
-            $query .= " ORDER BY " . implode(', ', $this->order);
+        if ($this->fields == ['*']) {
+            $this->fields = $fields;
+            return $this;
         }
-        if ($this->limit > 0) {
-            $query .= " LIMIT " . $this->limit;
-        }
-        if ($this->offset !== null) {
-            $query .= " OFFSET " . $this->offset;
-        }
-        if ($this->page !== 0) {
-            $query .= " OFFSET " . $this->offset;
-        }
-        return $query;
+        $this->fields = array_merge($this->fields, $fields);
+        return $this;
     }
 }

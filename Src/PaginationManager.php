@@ -147,6 +147,22 @@ class Pagination
     }
 
     /**
+     * @return int
+     */
+    public function getIndex(): int
+    {
+        return $this->index;
+    }
+
+    /**
+     * @param int $index
+     */
+    public function setIndex(int $index): void
+    {
+        $this->index = $index;
+    }
+
+    /**
      * @return mixed
      */
     public function getPerPage(): int
@@ -178,7 +194,6 @@ class Pagination
         $this->total = $total;
     }
 
-
     /**
      * @return int
      */
@@ -193,22 +208,6 @@ class Pagination
     public function setLimit(int $limit): void
     {
         $this->limit = $limit;
-    }
-
-    /**
-     * @return int
-     */
-    public function getIndex(): int
-    {
-        return $this->index;
-    }
-
-    /**
-     * @param int $index
-     */
-    public function setIndex(int $index): void
-    {
-        $this->index = $index;
     }
 
     /**
@@ -287,21 +286,21 @@ class PaginationManager extends Pagination
 
     /**
      * getPaginationJson
-
-    public function getPaginationJson()
-    {
-        $data = array();
-        if (parent::getLast() > 1) {
-            $data['previous'] = parent::getPrevious();
-            $data['next'] = parent::getNext();
-            $data['count'] = parent::getTotal();
-            $data['limitMin'] = parent::getLimitMin();
-            $data['limitMax'] = parent::getLimitMax();
-            $data['curentPage'] = parent::getIndex();
-            $data['last'] = parent::getLast();
-        }
-        echo json_encode($data);
-    }*/
+     *
+     * public function getPaginationJson()
+     * {
+     * $data = array();
+     * if (parent::getLast() > 1) {
+     * $data['previous'] = parent::getPrevious();
+     * $data['next'] = parent::getNext();
+     * $data['count'] = parent::getTotal();
+     * $data['limitMin'] = parent::getLimitMin();
+     * $data['limitMax'] = parent::getLimitMax();
+     * $data['curentPage'] = parent::getIndex();
+     * $data['last'] = parent::getLast();
+     * }
+     * echo json_encode($data);
+     * }*/
 
     /**
      * getPaginationArray
@@ -325,18 +324,18 @@ class PaginationManager extends Pagination
     {
         if (parent::getLast() > 1) {
             echo "<nav>";
-                echo "<ul class='pagination justify-content-center'>";
-                $currenPrevioust = parent::getIndex() == parent::getPrevious() ? 'disabled' : '';
-                echo "<li class='page-item $currenPrevioust'> <a class='page-link' href='?page=1'>first</a></li>";
-                echo "<li class='page-item $currenPrevioust'> <a class='page-link' href='?page=".parent::getPrevious()."'>Previous</a></li>";
-                for ($i = parent::getFirst(); $i <= parent::getLast(); $i++) {
-                    $current = $i == parent::getIndex() ? 'disabled' : '';
-                    echo "<li class='page-item $current'><a class='page-link' href='?page=$i'>$i</a></li>";
-                }
-                $currenNext = parent::getIndex() == parent::getNext() ? 'disabled' : '';
-                echo "<li class='page-item $currenNext'> <a class='page-link' href='?page=".parent::getNext()."'>Next</a></li>";
-                echo "<li class='page-item $currenNext'> <a class='page-link' href='?page=".parent::getLast()."'>Last</a></li>";
-                echo "</ul>";
+            echo "<ul class='pagination justify-content-center'>";
+            $currenPrevioust = parent::getIndex() == parent::getPrevious() ? 'disabled' : '';
+            echo "<li class='page-item $currenPrevioust'> <a class='page-link' href='?page=1'>first</a></li>";
+            echo "<li class='page-item $currenPrevioust'> <a class='page-link' href='?page=" . parent::getPrevious() . "'>Previous</a></li>";
+            for ($i = parent::getFirst(); $i <= parent::getLast(); $i++) {
+                $current = $i == parent::getIndex() ? 'disabled' : '';
+                echo "<li class='page-item $current'><a class='page-link' href='?page=$i'>$i</a></li>";
+            }
+            $currenNext = parent::getIndex() == parent::getNext() ? 'disabled' : '';
+            echo "<li class='page-item $currenNext'> <a class='page-link' href='?page=" . parent::getNext() . "'>Next</a></li>";
+            echo "<li class='page-item $currenNext'> <a class='page-link' href='?page=" . parent::getLast() . "'>Last</a></li>";
+            echo "</ul>";
             echo "</nav>";
         }
     }

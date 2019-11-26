@@ -25,7 +25,7 @@ class DatabasePdo// implements DatabasePdoInrface
     /**
      * DatabasePdo constructor.
      * @param string $localhost
-     * @param string $dbname
+     * @param string $dbnamereformat
      * @param string $username
      * @param string $password
      */
@@ -36,6 +36,7 @@ class DatabasePdo// implements DatabasePdoInrface
             PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_OBJ
         ]);
     }
+
     public function getPdo(): \PDO
     {
         return $this->bdd;
